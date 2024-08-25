@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "f5-ps-ansible"
+version = "1.0.0"
+description = "This collection provides modules to configure F5 BIG-IP appliances running F5OS using the RESTCONF API interface."
+authors = ["Simon Kowallik <github@simonkowallik.com>"]
+license = "GPL3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.2"
+black = "^24.8.0"
+isort = "^5.13.2"
+pytest = "^8.3.2"
+ansible-core = "^2.17.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

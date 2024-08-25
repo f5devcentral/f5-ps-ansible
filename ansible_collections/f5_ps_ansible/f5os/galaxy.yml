@@ -1,0 +1,31 @@
+---
+namespace: f5_ps_ansible
+name: f5os
+version: 1.0.0
+readme: README.md
+authors:
+- Simon Kowallik <github@simonkowallik.com>
+
+description: This collection provides modules to configure F5 BIG-IP appliances running F5OS using the RESTCONF API interface.
+
+license:
+- GPL-3.0-only
+
+license_file: 'LICENSE'
+
+tags:
+  - f5
+  - networking
+  - rseries
+  - velos
+
+dependencies:
+  f5networks.f5os: '>=1.10.0'
+
+repository: https://github.com/f5devcentral/f5-ps-ansible
+documentation: https://github.com/f5devcentral/f5-ps-ansible
+homepage: https://github.com/f5devcentral/f5-ps-ansible
+issues: https://github.com/f5devcentral/f5-ps-ansible/issues
+
+build_ignore:
+  - tests/**
