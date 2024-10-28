@@ -13,7 +13,7 @@ This is documentation site for ansible modules contributed to the F5 DevCentral 
 
 Currently this repository contains ansible modules for:
 
-- [f5os](./f5_ps_ansible.f5os/)
+- [f5os](./f5os/)
 
 ## Support, SLA and License
 

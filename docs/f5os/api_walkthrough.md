@@ -120,7 +120,9 @@ cat <<END_OF_REQUEST_DATA | PUT /data/openconfig-system:system/dns
   }
 }
 END_OF_REQUEST_DATA
+```
 
+```shell
 204
 ```
 
@@ -169,7 +171,9 @@ cat <<END_OF_REQUEST_DATA | PUT /data/openconfig-system:system/dns/servers/serve
   ]
 }
 END_OF_REQUEST_DATA
+```
 
+```shell
 201
 ```
 
@@ -196,7 +200,9 @@ cat <<END_OF_REQUEST_DATA | PATCH /data/openconfig-system:system/dns
   }
 }
 END_OF_REQUEST_DATA
+```
 
+```shell
 204
 ```
 
@@ -242,7 +248,9 @@ cat <<END_OF_REQUEST_DATA | PUT /data/openconfig-system:system/dns/servers
     }
 }
 END_OF_REQUEST_DATA
+```
 
+```shell
 204
 ```
 
@@ -265,7 +273,9 @@ cat <<END_OF_REQUEST_DATA | PUT /data/openconfig-system:system/dns/servers
     }
 }
 END_OF_REQUEST_DATA
+```
 
+```shell
 204
 ```
 
@@ -276,7 +286,9 @@ Removal of individual items is doable using the DELETE method, the URI is the sa
 
 ```shell
 DELETE /data/openconfig-system:system/dns/servers/server=8.8.8.8
+```
 
+```shell
 204
 ```
 
