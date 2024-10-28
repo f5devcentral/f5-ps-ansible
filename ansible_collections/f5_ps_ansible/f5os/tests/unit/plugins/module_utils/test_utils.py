@@ -183,10 +183,17 @@ class Test_dicts_equal:
              { "one": [ {"t": "1", "k": "a", "1": True}, [1, 3, 2, True, False], {"t": "2", "l": ["XXXX", 2, "c"]}, ], "list": [2, 1, 3,] },
             False),
         ])
+
     def test_deep(self, d1, d2, result):
         assert dicts_equal(d1, d2) == result
 
+    def test_mutation(self):
+        '''must not mutate input dictionaries'''
+        d1 = {"list": [{"key1": 1, "key2": 2}]}
+        d2 = {"list": [{"key2": 2}]}
 
+        assert dicts_equal(d1, d2, remove_keys=['key1']) == True
+        assert d1 == {"list": [{"key1": 1, "key2": 2}]}
 
 class Test_remove_state_property:
     TEST_NTP = [

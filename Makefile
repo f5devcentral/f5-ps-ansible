@@ -46,8 +46,13 @@ isort:
 
 code-format: isort black ruff # more is MORE!
 
-test:
-	PYTHONPATH=$PWD cd ansible_collections/f5_ps_ansible/f5os && pytest tests/unit/plugins/module_utils/test_utils.py 
+doc: docs ## alias for docs
+
+docs:
+	python3 docs/f5os/ansible_module_autodoc.py
+
+pytests:
+	cd ansible_collections/f5_ps_ansible/f5os && PYTHONPATH=$(BASE_DIR) pytest tests/unit/plugins/module_utils/test_utils.py
 
 tests: test
 

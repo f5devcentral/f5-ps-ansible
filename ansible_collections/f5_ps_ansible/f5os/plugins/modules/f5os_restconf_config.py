@@ -61,7 +61,8 @@ attributes:
 notes:
     - This module requires the f5networks.f5os collection to be installed on the ansible controller.
     - This module uses the httpapi of the f5networks.f5os collection.
-    - When using config_query the jmespath module is required.
+    - When using config_query jmespath module is required.
+    - For better diff support, deepdiff module is recommended.
 """
 
 EXAMPLES = r"""
@@ -94,11 +95,13 @@ EXAMPLES = r"""
     method: PATCH  # Use PATCH to partially update the configuration
     config:
       openconfig-lldp:config:
+        # the PATCH method will only update these keys:
         enabled: 'true'
         f5-lldp:max-neighbors-per-port: 50
-        # all missing keys of this entity need to be in keys_ignore,
-        # otherwise change detection will fail and ansible will always report a change
     keys_ignore:
+      # keys_ignore has all remaining keys of this API endpoint.
+      # The ansible module will therefore ignore the values in the
+      # below keys when comparing the desired and current configuration.
       - f5-lldp:reinit-delay
       - f5-lldp:tx-delay
       - f5-lldp:tx-hold

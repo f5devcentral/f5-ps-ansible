@@ -3,6 +3,8 @@
 # Copyright: Simon Kowallik for the F5 DevCentral Community
 # GNU General Public License v3.0 (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from copy import deepcopy
+
 from ansible.module_utils.connection import Connection
 
 
@@ -101,7 +103,7 @@ def dicts_equal(d1, d2, remove_keys=[]) -> bool:
     Values with integers and floats are compared as strings, hence the type is ignored.
     """
 
-    def _process_lists(d1, d2):
+    def _process_lists(_d1, _d2):
         def _sort_key(element):
             if isinstance(element, dict):
                 return (3, str(element))  # Assign a higher priority to dicts
@@ -114,68 +116,64 @@ def dicts_equal(d1, d2, remove_keys=[]) -> bool:
             else:
                 return (4, str(element))  # Catch-all for other types
 
-        if len(d1) != len(d2):
+        if len(_d1) != len(_d2):
             return False
 
         # sort lists by type and value
-        _l1 = sorted(d1, key=_sort_key)
-        _l2 = sorted(d2, key=_sort_key)
+        _l1 = sorted(_d1, key=_sort_key)
+        _l2 = sorted(_d2, key=_sort_key)
 
-        for i in range(len(_l1)):
-            if isinstance(_l1[i], dict):
-                print(f"_l1[{i}] is dict")
-                if not dicts_equal(_l1[i], _l2[i]):
+        for i, item in enumerate(_l1):
+            if isinstance(item, dict):
+                if not dicts_equal(item, _l2[i]):
                     return False
-            elif isinstance(_l1[i], list):
-                print(f"_l1[{i}] is list")
-                if not _process_lists(_l1[i], _l2[i]):
+            elif isinstance(item, list):
+                if not _process_lists(item, _l2[i]):
                     return False
             else:
-                print(f"_l1[{i}] is other")
-                if str(_l1[i]) not in [
+                if str(item) not in [
                     str(entry) for entry in _l2 if not isinstance(entry, (list, dict))
                 ]:
                     return False
         return True
 
+    _d1 = deepcopy(d1)
+    _d2 = deepcopy(d2)
+
     if remove_keys:
-        d1 = recurse_remove_keys(d1, remove_keys)
-        d2 = recurse_remove_keys(d2, remove_keys)
+        _d1 = recurse_remove_keys(_d1, remove_keys)
+        _d2 = recurse_remove_keys(_d2, remove_keys)
 
     # simplest case: if the dictionaries are the same object, they are the same
-    if d1 == d2:
+    if _d1 == _d2:
         return True
 
     # If the types are different, the dictionaries are different
-    if type(d1) != type(d2):
+    if type(_d1) != type(_d2):
         return False
 
     # If the dictionaries are not the same length, they are different
-    if len(d1) != len(d2):
+    if len(_d1) != len(_d2):
         return False
 
     # If the dictionaries are empty, they are the same
-    if len(d1) == 0:
+    if len(_d1) == 0:
         return False
 
     # If the dictionaries are not empty, compare the keys
-    if set(d1) != set(d2):
+    if set(_d1) != set(_d2):
         return False
 
     # If the keys are the same, compare the values
-    for key in d1.keys():
-        print(f"key: {key}")
-        if isinstance(d1[key], dict):
-            print(f"{key} is dict")
-            if not dicts_equal(d1[key], d2[key]):
+    for key in _d1.keys():
+        if isinstance(_d1[key], dict):
+            if not dicts_equal(_d1[key], _d2[key]):
                 return False
-        elif isinstance(d1[key], list):
-            print(f"{key} is list")
-            if not _process_lists(d1[key], d2[key]):
+        elif isinstance(_d1[key], list):
+            if not _process_lists(_d1[key], _d2[key]):
                 return False
         else:
-            print(f"{key} is other")
-            if not str(d1[key]) == str(d2[key]):
+            if str(_d1[key]) != str(_d2[key]):
                 return False
 
     return True

@@ -1,0 +1,88 @@
+title: f5-ps-ansible
+description: This collection provides modules to configure F5 BIG-IP appliances running F5OS using the RESTCONF API interface.
+remote_theme: just-the-docs/just-the-docs@v0.10.0
+
+url: https://f5devcentral.github.io/f5-ps-ansible/
+
+aux_links:
+  Repository: https://github.com/f5devcentral/f5-ps-ansible/
+
+defaults:
+  - scope:
+      path: "docs"
+      type: "pages"
+    values:
+      layout: "default"
+      toc: true
+
+nav_enabled: true
+heading_anchors: true
+
+back_to_top: true
+back_to_top_text: "Back to top"
+
+permalink: pretty
+enable_copy_code_button: true
+
+callouts_level: loud
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: yellow
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: blue
+  warning:
+    title: Warning
+    color: red
+
+kramdown:
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-include-cache
+
+exclude:
+ # from https://github.com/jekyll/jekyll/blob/master/lib/site_template/_config.yml:
+   - .sass-cache/
+   - .jekyll-cache/
+   - gemfiles/
+   - Gemfile
+   - Gemfile.lock
+   - node_modules/
+   - vendor/bundle/
+   - vendor/cache/
+   - vendor/gems/
+   - vendor/ruby/
+ # specific to the theme website:
+   - bin/
+   - lib/
+   - "*.gemspec"
+   - "*.gem"
+   - LICENSE.txt
+   - package.json
+   - package-lock.json
+   - Rakefile
+   - README.md
+   - CODE_OF_CONDUCT.md
+   - docker-compose.yml
+   - Dockerfile
+ # theme test code
+   - fixtures/
+
+color_scheme: nil
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/f5devcentral/f5-ps-ansible/"
+gh_edit_branch: "main"
+gh_edit_view_mode: "tree"
