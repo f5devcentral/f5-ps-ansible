@@ -27,7 +27,7 @@ nav_enabled: true
 | method | The HTTP method to use for modifying the resource. | False | `str` | `PUT` | `PUT, PATCH` |
 | state | The desired state of the resource. | False | `str` | `present` | `present, absent` |
 | config | The desired configuration to apply to the resource (PATCH) or to replace the resource with (PUT). | False | `dict` |  |  |
-| keys_ignore | A list of keys to ignore when comparing the current and desired configuration. | False | `list` |  |  |
+| keys_ignore | A list of keys to ignore when comparing the current and desired configuration. This is useful when only a subset of the configuration is desired to be compared. The keys are ignored for the comparison only, not for the actual configuration. The keys will be ignored recursively in the desired configuration and current configuration. | False | `list` |  |  |
 | config_query | A JMESPath query to filter the current configuration before it is compared to the desired configuration. | False | `str` |  |  |
 
 ## Attributes
@@ -88,17 +88,47 @@ nav_enabled: true
     method: PATCH  # Use PATCH to partially update the configuration
     config:
       openconfig-lldp:config:
+        # the PATCH method will only update these keys:
         enabled: 'true'
         f5-lldp:max-neighbors-per-port: 50
-        # all missing keys of this entity need to be in keys_ignore,
-        # otherwise change detection will fail and ansible will always report a change
     keys_ignore:
+      # keys_ignore has all remaining keys of this API endpoint.
+      # The ansible module will therefore ignore the values in the
+      # below keys when comparing the desired and current configuration.
       - f5-lldp:reinit-delay
       - f5-lldp:tx-delay
       - f5-lldp:tx-hold
       - f5-lldp:tx-interval
       - system-description
       - system-name
+
+- name: 'Using PATCH on a group of resources (list) with additional config endpoints'
+  vars:
+    server:
+      address: 9.9.9.11
+      port: 53
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
+    method: 'PATCH'
+    # For change detection and idempotency to work we will need to filter the API response.
+    # This can be done using the below "config_query" using a jmespath query, 
+    # the jmespath module is required!
+    #
+    # As the API returns the whole list of resources (dns servers) possibly along with
+    # 'host-entries' and 'config', we need to reduce the response to the item we expect
+    # to be created by the PATCH operation.
+    # f5os_restconf_config must be able to compare the API response (current_config) to
+    # the desired configuration (desired_config)
+    config_query: |-
+      "openconfig-system:dns".servers.server[?address == '{{ server.address }}'] | { "openconfig-system:dns": { servers: { server: @ } } }
+    config:
+      openconfig-system:dns:
+        servers:
+          server:
+            - address: "{{ server.address }}"
+              config:
+                address: "{{ server.address }}"
+                port: "{{ server.port }}"  # no need to change to int, the type is ignored by the ansible module
 ```
 
 {% endraw %}

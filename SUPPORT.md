@@ -1,13 +1,12 @@
 # Support
 
-This repository contains community supported code which is not covered F5 Technical Support nor any SLA.
+This repository contains community code which is not covered by F5 Technical Support nor any SLA.
 
 Please read and understand the license before use.
 
 The solutions in this repository are not guaranteed to work, keep working or being updated with required changes at any time.
 
-You, as the implementor, are soley responsible.
-
+You, as the implementor, are solely responsible.
 
 ## Community support
 
