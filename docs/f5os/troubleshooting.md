@@ -47,14 +47,14 @@ Assume the below is configured for the `/data/openconfig-system:system/dns` reso
 }
 ```
 
-### Chapter One - Try 1
+### Chapter One - Attempt 1
 
 Assume we decided to use the PATCH method to add an additional DNS resolver `9.9.9.10`.
 
 Running the below succeeds, the server is added (check the GUI, CLI and/or API).
 
 ```yaml
-- name: 'Chapter One - Try 1'
+- name: 'Chapter One - Attempt 1'
   f5_ps_ansible.f5os.f5os_restconf_config:
     uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
     method: 'PATCH'
@@ -74,7 +74,7 @@ However when running the task again, ansible reports `changed=1`, so what is the
 Let's run it again, this time enabling debugging:
 
 ```shell
-ansible-playbook <playbook.yaml> -i <f5os_device> -t try-1 -vvv
+ansible-playbook <playbook.yaml> -i <f5os_device> -t attempt-1 -vvv
 ```
 
 The below `"api_response"` object describes the response received from the F5OS API. In this case it is the response to the PATCH request. Contents is typically empty when a config operation was successful. On errors it usually carries more information.
@@ -375,15 +375,15 @@ Finally `"keys_ignore"` is included by the ansible module to explicitly communic
 
 We need to make sure that we only compare the config that is relevant, e.g. we should not take `"host-entries"` and the DNS search domain(s) into account.
 
-### Chapter Two - Try 2
+### Chapter Two - Attempt 2
 
 {: .note }
 > We will omit many of the responses and only focus on the relevant details for brevity.
 
-We will try to solve this by using `keys_ignore`, updated playbook task below.
+We will attempt to solve this by using `keys_ignore`, updated playbook task below.
 
 ```yaml
-- name: 'Chapter Two - Try 2'
+- name: 'Chapter Two - Attempt 2'
   f5_ps_ansible.f5os.f5os_restconf_config:
     uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
     method: 'PATCH'
@@ -460,7 +460,7 @@ Our tasks are as follows:
 
 This will allow us to successfully determine if the server is already part of the current config or needs to be added.
 
-### Chapter Three - Try 3
+### Chapter Three - Attempt 3
 
 Using `config_query`, which utilizes JMESPath, actually the ansible `json_query` (`community.general.json_query`), to filter the current config. This allows us to bring the existing configuration data into the right "shape".
 
@@ -469,7 +469,7 @@ The below jmespath expression (`config_query`) basically searches for the DNS se
 If the current config does not contain a server with that address, the created data structure would have an empty list.
 
 ```yaml
-- name: 'Try 3'
+- name: 'Attempt 3'
   vars:
     server_address: 9.9.9.10
   f5_ps_ansible.f5os.f5os_restconf_config:
@@ -559,7 +559,7 @@ Below is a full playbook to test this yourself.
                       - 192.0.2.10
       tags: ['init-scenario', 'never']
 
-    - name: 'Try 1'
+    - name: 'Attempt 1'
       f5_ps_ansible.f5os.f5os_restconf_config:
         uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
         method: 'PATCH'
@@ -572,9 +572,9 @@ Below is a full playbook to test this yourself.
                     address: 9.9.9.10
                     port: 53
       tags: ['try-1', 'never']
-      register: try_run
+      register: module_run
 
-    - name: 'Try 2'
+    - name: 'Attempt 2'
       f5_ps_ansible.f5os.f5os_restconf_config:
         uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
         method: 'PATCH'
@@ -590,9 +590,9 @@ Below is a full playbook to test this yourself.
                     address: 9.9.9.10
                     port: 53
       tags: ['try-2', 'never']
-      register: try_run
+      register: module_run
 
-    - name: 'Try 3'
+    - name: 'Attempt 3'
       vars:
         server_address: 9.9.9.10
       f5_ps_ansible.f5os.f5os_restconf_config:
@@ -609,26 +609,26 @@ Below is a full playbook to test this yourself.
                     address: '{{ server_address }}'
                     port: 53
       tags: ['try-3', 'never']
-      register: try_run
+      register: module_run
 
     - name: 'Debug data using register and ansible.builtin.debug'
       ansible.builtin.debug:
         msg:
           - "--[intial GET to fetch current config/state]---------------"
-          - "api_response.code: {{ try_run.api_response.code }}"
+          - "api_response.code: {{ module_run.api_response.code }}"
           - "---[current_config_state]----------------------------------"
-          - "current_config_state.api_response: {{ try_run.current_config_state.api_response | combine({'headers': 'omitted for brevity'}) }}"
+          - "current_config_state.api_response: {{ module_run.current_config_state.api_response | combine({'headers': 'omitted for brevity'}) }}"
           - "---[current_state vs. desired_state]-----------------------"
-          - "current_config_state.current_state: {{ try_run.current_config_state.current_state }}"
-          - "desired_config_state.desired_state: {{ try_run.desired_config_state.desired_state }}"
+          - "current_config_state.current_state: {{ module_run.current_config_state.current_state }}"
+          - "desired_config_state.desired_state: {{ module_run.desired_config_state.desired_state }}"
           - "---[current_config vs. desired_config]---------------------"
-          - "current_config_state.current_config: {{ try_run.current_config_state.current_config }}"
-          - "desired_config_state.desired_config: {{ try_run.desired_config_state.desired_config }}"
+          - "current_config_state.current_config: {{ module_run.current_config_state.current_config }}"
+          - "desired_config_state.desired_config: {{ module_run.desired_config_state.desired_config }}"
           - "---[ansible changed=?]-------------------------------------"
-          - "changed: {{ try_run.changed }}"
+          - "changed: {{ module_run.changed }}"
           - "---[changes, derived from current_config/desired_config]--"
-          - "changes.before: {{ try_run.changes.get('before') }}"
-          - "changes.after: {{ try_run.changes.get('after') }}"
+          - "changes.before: {{ module_run.changes.get('before') }}"
+          - "changes.after: {{ module_run.changes.get('after') }}"
       tags: ['debug', 'never']
 ```
 
@@ -637,16 +637,16 @@ Below is a full playbook to test this yourself.
 ansible-playbook <playbook> -t init-scenario
 
 # adds the new server, changed=1
-ansible-playbook <playbook> -t try-1 # -t debug
+ansible-playbook <playbook> -t attempt-1 # -t debug
 
 # server exists, changed=0 is expected but ansible reports changed=1
-ansible-playbook <playbook> -t try-1 # -t debug
+ansible-playbook <playbook> -t attempt-1 # -t debug
 
 # server exists, changed=0 is expected but ansible still reports changed=1
-ansible-playbook <playbook> -t try-2 # -t debug
+ansible-playbook <playbook> -t attempt-2 # -t debug
 
 # server exists, ansible finally reports changed=0
-ansible-playbook <playbook> -t try-3 # -t debug
+ansible-playbook <playbook> -t attempt-3 # -t debug
 ```
 
 ```shell
@@ -654,10 +654,10 @@ ansible-playbook <playbook> -t try-3 # -t debug
 ansible-playbook <playbook> -t init-scenario
 
 # adds the new server, changed=1
-ansible-playbook <playbook> -t try-3 # -t debug
+ansible-playbook <playbook> -t attempt-3 # -t debug
 
 # server exists, ansible reports changed=0
-ansible-playbook <playbook> -t try-3 # -t debug
+ansible-playbook <playbook> -t attempt-3 # -t debug
 ```
 
 {% endraw %}
