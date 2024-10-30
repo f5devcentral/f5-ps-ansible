@@ -21,10 +21,10 @@ Using `requirements.yml`:
   version: main
   type: git
 
-# specific release, version 1.1.0 in this example
+# specific release, version 1.2.0 in this example
 #- source: https://github.com/f5devcentral/f5-ps-ansible.git#ansible_collections/f5_ps_ansible/f5os
-#  version: main
-#  type: 1.1.0
+#  version: 1.2.0
+#  type: git
 ```
 
 ```shell
