@@ -189,11 +189,11 @@ class Test_dicts_equal:
 
     def test_mutation(self):
         '''must not mutate input dictionaries'''
-        d1 = {"list": [{"key1": 1, "key2": 2}]}
-        d2 = {"list": [{"key2": 2}]}
+        d1 = {"list": [{"key1": "IGNORE!", "key2": 2}]}
+        d2 = {"list": [{"key1": 1,         "key2": 2}]}
 
         assert dicts_equal(d1, d2, remove_keys=['key1']) == True
-        assert d1 == {"list": [{"key1": 1, "key2": 2}]}
+        assert d2 == {"list": [{"key1": 1,         "key2": 2}]}
 
 class Test_remove_state_property:
     TEST_NTP = [
