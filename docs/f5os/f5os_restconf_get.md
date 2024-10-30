@@ -20,16 +20,16 @@ nav_enabled: true
 
 ## Options
 
-| Option | Description | Required | Type | Default | Choices |
-|--------|-------------|----------|------|---------|---------|
-| uri | The URI of the resource to read. | True | `str` |  |  |
+| Option | Description | Required | Type | Default / Choices |
+|--------|-------------|----------|------|-----------------|
+| `uri` | The URI of the resource to read. | `true` | `str` |   |
 
 ## Attributes
 
 | Attribute | Support | Description |
 |-----------|---------|-------------|
-| Check_mode | full | The module supports check mode and will report what changes would have been made. |
-| Diff_mode | none | The module supports diff mode and will report the differences between the desired and actual state. |
+| `check_mode` | full | The module supports check mode and will report what changes would have been made. |
+| `diff_mode` | none | The module supports diff mode and will report the differences between the desired and actual state. |
 
 ## Notes
 
@@ -40,7 +40,7 @@ nav_enabled: true
 
 | Key | Description | Returned | Type | Elements |
 |-----|-------------|----------|------|----------|
-| api_response | The API response received from the F5OS RESTCONF API. | always | `dict` |  |
+| `api_response` | The API response received from the F5OS RESTCONF API. | always | `dict` |  |
 
 ## Examples
 
