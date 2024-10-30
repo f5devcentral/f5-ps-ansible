@@ -24,7 +24,7 @@ back_to_top_text: "Back to top"
 permalink: pretty
 enable_copy_code_button: true
 
-callouts_level: loud
+#callouts_level: loud
 callouts:
   highlight:
     color: yellow
@@ -79,7 +79,11 @@ exclude:
  # theme test code
    - fixtures/
 
-color_scheme: nil
+color_scheme: 245
+
+sass:
+  load_paths:
+    - docs/_sass
 
 gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub"

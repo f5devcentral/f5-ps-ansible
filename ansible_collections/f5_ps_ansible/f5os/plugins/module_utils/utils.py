@@ -101,6 +101,9 @@ def dicts_equal(d1, d2, remove_keys=[]) -> bool:
 
     Lists with different order but same content are considered equal.
     Values with integers and floats are compared as strings, hence the type is ignored.
+
+    d1 will be mutated by this function, so make sure to pass a copy if you want to keep the original.
+    d2 will not be mutated by this function.
     """
 
     def _process_lists(_d1, _d2):
@@ -137,7 +140,7 @@ def dicts_equal(d1, d2, remove_keys=[]) -> bool:
                     return False
         return True
 
-    _d1 = deepcopy(d1)
+    _d1 = d1  # d1 will be mutated by this function
     _d2 = deepcopy(d2)
 
     if remove_keys:

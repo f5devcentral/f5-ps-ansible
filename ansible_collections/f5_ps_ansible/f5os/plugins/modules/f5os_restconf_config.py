@@ -19,11 +19,11 @@ author:
 version_added: "1.0.0"
 options:
   uri:
-    description: The resource URI to work with.
+    description: The URI of the resource to configure.
     required: True
     type: str
   method:
-    description: The HTTP method to use for modifying the resource.
+    description: The HTTP method to configure the resource.
     required: False
     type: str
     default: "PUT"
@@ -43,7 +43,7 @@ options:
     required: False
     type: dict
   keys_ignore:
-    description: A list of keys to ignore when comparing the current and desired configuration.
+    description: A list of keys to ignore when comparing the current and desired configuration. This is useful when only a subset of the configuration is desired to be compared. The keys are ignored for the comparison only, not for the actual configuration. The keys will be ignored recursively in the desired configuration and current configuration.
     required: False
     type: list
     elements: str
@@ -108,6 +108,34 @@ EXAMPLES = r"""
       - f5-lldp:tx-interval
       - system-description
       - system-name
+
+- name: 'Using PATCH on a group of resources (list) with additional config endpoints'
+  vars:
+    server:
+      address: 9.9.9.11
+      port: 53
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/dns'
+    method: 'PATCH'
+    # For change detection and idempotency to work we will need to filter the API response.
+    # This can be done using the below "config_query" using a jmespath query, 
+    # the jmespath module is required!
+    #
+    # As the API returns the whole list of resources (dns servers) possibly along with
+    # 'host-entries' and 'config', we need to reduce the response to the item we expect
+    # to be created by the PATCH operation.
+    # f5os_restconf_config must be able to compare the API response (current_config) to
+    # the desired configuration (desired_config)
+    config_query: |-
+      "openconfig-system:dns".servers.server[?address == '{{ server.address }}'] | { "openconfig-system:dns": { servers: { server: @ } } }
+    config:
+      openconfig-system:dns:
+        servers:
+          server:
+            - address: "{{ server.address }}"
+              config:
+                address: "{{ server.address }}"
+                port: "{{ server.port }}"  # no need to change to int, the type is ignored by the ansible module
 """
 
 RETURN = r"""
@@ -137,6 +165,8 @@ config_query:
     returned: when config_query is set
     type: str
 """
+
+from copy import deepcopy
 
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import AnsibleModule
@@ -198,11 +228,13 @@ def main():
             200,  # resource present
         ]:
             current_state = "present"
-            current_config = remove_state_property(api_response.get("contents", {}))
+            current_config = deepcopy(api_response.get("contents", {}))
+            current_config = remove_state_property(current_config)
             current_config = number_values_to_string(current_config)
             current_config = format_bool_values(current_config)
 
             if param_config_query:
+                # mutate current_config to only contain the desired part of the configuration
                 current_config = json_query(current_config, param_config_query)
 
         elif api_response.get("code", 0) in [

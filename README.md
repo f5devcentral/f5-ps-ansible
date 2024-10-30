@@ -6,10 +6,10 @@ This repository contains ansible modules contributed to the F5 DevCentral commun
 
 Currently this repository contains ansible modules for:
 
-- [f5os](ansible_collections/f5_ps_ansible/f5os/README.md)
+- [f5os](ansible_collections/f5_ps_ansible/f5os/README.md) [:notebook: documentation! :sparkles:](https://f5devcentral.github.io/f5-ps-ansible/f5os)
 
 Please see the README of each ansible collection (above) for details
 
 ## Support, SLA and License
 
-This is a community supported repository, please see [SUPPORT](SUPPORT.md) and [LICENSE](COPYING) for details.
+This is a community repository, please see [SUPPORT](SUPPORT.md) and [LICENSE](COPYING) for details.

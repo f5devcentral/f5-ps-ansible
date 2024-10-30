@@ -9,7 +9,7 @@ nav_enabled: true
 
 ## F5OS API by example
 
-Besides reading through F5 provided examples and documentation it is very helpful to use your favorite API client (Postman, Bruno, curl, ..) and interact with it. In this section we will explore the F5OS DNS API endpoint using curl.
+Besides reading through F5 provided examples and documentation it is very helpful to use your favorite API client (Postman, Bruno, curl, ..) and interact with it. In this section we will explore the F5OS DNS API using curl.
 
 First, we will create a very basic set of clients using curl on bash/zsh. We assume port 443 connectivity to the F5OS Management IP and therefore also prefix the URI with /api.
 
@@ -86,7 +86,7 @@ GET /data/openconfig-system:system/dns
 ```
 
 {: .note }
-> To keep the documentation concise the GET to the modified endpoint will not be repeated after every modification, the reader is advised to perform this action nevertheless for a better understanding of the API.
+> To keep the documentation concise the GET to the modified resource will not be repeated after every modification, the reader is advised to perform this action nevertheless for a better understanding of the API.
 
 ## Step 2. Add additional DNS resolvers
 
@@ -94,7 +94,7 @@ Let's add additional DNS resolvers, 8.8.4.4, 9.9.9.10, 9.9.9.11 and 149.112.112.
 
 We now have three methods:
 
-1. Declaring the whole /dns endpoint. This is declartive but also abosulte, we assume full authority about the endpoint.
+1. Declaring the whole /dns resource. This is declarative but also absolute, we assume full authority about the resource.
 2. Declaring a single server, working on an item-by-item basis. This is declarative as well but *per-item*, hence allows shared control over the configuration.
 3. Using the PATCH method
 
@@ -127,7 +127,7 @@ END_OF_REQUEST_DATA
 ```
 
 The PUT method only returned a http status code (204), no payload/content typically returned when an operation succeeds.
-When we issue a GET we expect the DNS resolver/server to be part of the list. We actually expect the DNS endpoint to look exactly like the payload we sent.
+When we issue a GET we expect the DNS resolver/server to be part of the list. We actually expect the DNS resource to look exactly like the payload we sent.
 If we would have omitted `"host-entries"` or `"config": {"search": [..]}`, those configurations would have been deleted as per our "desired configuration" (declarative!).
 
 ## Step 3. Item-level resource declaration
@@ -153,7 +153,7 @@ GET /data/openconfig-system:system/dns/servers/server=9.9.9.9
 }
 ```
 
-The correct URI can be retrieved from the API response of the first request we sent. `"servers": { "server": [ .. ] }` where `..` are the actual items. The items are addressable via their value in the `"address"` key. The name of the key does not really matter here, many other endpoints have other names for the keys like `"name"` or `"id"`. Usually there is a single key right next to the `"config"` object, hence it can be easily identified.
+The correct URI can be retrieved from the API response of the first request we sent. `"servers": { "server": [ .. ] }` where `..` are the actual items. The items are addressable via their value in the `"address"` key. The name of the key does not really matter here, many other resources have other names for the keys like `"name"` or `"id"`. Usually there is a single key right next to the `"config"` object, hence it can be easily identified.
 
 Now we add a new item (DNS resolution server):
 
@@ -184,7 +184,7 @@ Once again there is no return data. But this time the http status code is 201 (C
 
 ## Step 4. Using PATCH
 
-Next up is the `PATCH` method. We will target the "dns" endpoint (`/data/openconfig-system:system/dns`).
+Next up is the `PATCH` method. We will target the /dns resource (`/data/openconfig-system:system/dns`).
 
 With PATCH we only need to specify what configuration should be modified or added. We can omit other configuration items (eg. other servers) or sections like `"host-entries"` and `"config": {"search": [..]}`.
 
@@ -209,9 +209,9 @@ END_OF_REQUEST_DATA
 Again we only receive an http status code (204), repeated calls will also only yield a 204.
 
 
-## Step 5. PUT on dns/servers API endpoint
+## Step 5. PUT on dns/servers API resource
 
-Finally the last DNS resolver we will add using PUT/fully declarative but we will tighten our scope to the `dns/servers` endpoint. This allows us to omit `"host-entries"` and `"config": {"search": [..]}` savely. Ultimately we are only interested in defining the servers at this point.
+Finally the last DNS resolver we will add using PUT/fully declarative but we will tighten our scope to the `dns/servers` resource. This allows us to omit `"host-entries"` and `"config": {"search": [..]}` safely. Ultimately we are only interested in defining the servers at this point.
 
 Again we will first send a GET, this will provide us with the right format although we could probably guess this by now.
 

@@ -55,16 +55,18 @@ def generate_markdown(DOCUMENTATION, EXAMPLES=None, RETURNS=None):
     markdown_doc += f"**Version Added:** {version_added}\n"
 
     markdown_doc += "\n## Options\n\n"
-    markdown_doc += "| Option | Description | Required | Type | Default | Choices |\n"
-    markdown_doc += "|--------|-------------|----------|------|---------|---------|\n"
+    #markdown_doc += "| Option | Description | Required | Type | Default | Choices |\n"
+    #markdown_doc += "|--------|-------------|----------|------|---------|---------|\n"
+    markdown_doc += "| Option | Description | Required | Type | Default / Choices |\n"
+    markdown_doc += "|--------|-------------|----------|------|-----------------|\n"
     for option, details in options.items():
         description = details.get("description", "")
-        required = details.get("required", "")
+        required = '`true`' if details.get("required", False) else '`false`'
         type_ = f"`{details.get('type')}`" if details.get("type") else ""
-        default = f"`{details.get('default')}`" if details.get("default") else ""
+        default = f"Default: `{details.get('default')}`" if details.get("default") else ""
         choices_list = details.get("choices", [])
-        choices = f"`{', '.join(choices_list)}`" if choices_list else ""
-        markdown_doc += f"| {option} | {description} | {required} | {type_} | {default} | {choices} |\n"
+        choices = f"Choices: `{', '.join(choices_list)}`" if choices_list else ""
+        markdown_doc += f"| `{option}` | {description} | {required} | {type_} | {default} {choices} |\n"
 
     markdown_doc += "\n## Attributes\n\n"
     markdown_doc += "| Attribute | Support | Description |\n"
@@ -72,7 +74,7 @@ def generate_markdown(DOCUMENTATION, EXAMPLES=None, RETURNS=None):
     for attr, details in attributes.items():
         description = details.get("description", "")
         support = details.get("support", "")
-        markdown_doc += f"| {attr.capitalize()} | {support} | {description} |\n"
+        markdown_doc += f"| `{attr}` | {support} | {description} |\n"
 
     markdown_doc += "\n## Notes\n\n"
     for note in notes:
@@ -89,7 +91,7 @@ def generate_markdown(DOCUMENTATION, EXAMPLES=None, RETURNS=None):
             type_ = f"`{details.get('type')}`" if details.get("type") else ""
             elements = f"`{details.get('elements')}`" if details.get("elements") else ""
             markdown_doc += (
-                f"| {key} | {description} | {returned} | {type_} | {elements} |\n"
+                f"| `{key}` | {description} | {returned} | {type_} | {elements} |\n"
             )
 
     if EXAMPLES is not None:
