@@ -1,5 +1,7 @@
 .PHONY: clean clean-test clean-pyc clean-build docs help
 
+BASE_DIR := $(shell pwd)
+
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
