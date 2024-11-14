@@ -7,12 +7,14 @@ nav_enabled: true
 
 ## Installation
 
+Using `ansible-galaxy collection install` with the `main` repo.
+
 ```shell
 ansible-galaxy collection install \
   git@github.com:f5devcentral/f5-ps-ansible.git#ansible_collections/f5_ps_ansible/f5os,main
 ```
 
-Using `requirements.yml`:
+Using `requirements.yml` (recommended):
 
 ```yaml
 ---

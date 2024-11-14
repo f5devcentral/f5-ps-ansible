@@ -1,0 +1,6 @@
+---
+f5os_vlan_config:
+  name: vlan_name
+  id: 1234
+  lag: lag_name
+  state: present  # or 'absent'

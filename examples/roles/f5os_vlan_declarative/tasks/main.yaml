@@ -1,0 +1,29 @@
+---
+- name: 'Remove VLAN from LAG'
+  vars:
+    # extract vlans to remove (state=absent)
+    undesired_vlans: "{{ f5os_vlan_declarative_config | selectattr('state', 'defined') | selectattr('state', 'eq', 'absent') | list }}"
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-interfaces:interfaces/interface={{ item.lag }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ item.id }}"
+    state: absent
+  with_items: "{{ undesired_vlans }}"
+
+- name: 'Create VLAN'
+  vars:
+    # extract desired vlans, either state=present or state not defined (present is the default)
+    desired_vlans: "{{ f5os_vlan_declarative_config | selectattr('state', 'undefined') | list + f5os_vlan_declarative_config | selectattr('state', 'defined') | selectattr('state', 'eq', 'present') | list }}"
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-vlan:vlans"
+    config: "{{ lookup('ansible.builtin.template', './templates/vlans.yaml.j2') | from_yaml }}"
+    keys_ignore:
+      - members
+
+- name: 'Add VLAN to LAG'
+  vars:
+    # extract desired vlans, either state=present or state not defined (present is the default)
+    desired_vlans: "{{ f5os_vlan_declarative_config | selectattr('state', 'undefined') | list + f5os_vlan_declarative_config | selectattr('state', 'defined') | selectattr('state', 'eq', 'present') | list }}"
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-interfaces:interfaces/interface={{ item.lag }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ item.id }}"
+    config:
+      openconfig-vlan:trunk-vlans: ['{{ item.id }}']
+  with_items: "{{ desired_vlans }}"

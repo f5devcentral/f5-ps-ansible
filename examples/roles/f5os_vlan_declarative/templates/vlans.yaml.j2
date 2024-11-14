@@ -1,0 +1,9 @@
+---
+openconfig-vlan:vlans:
+  vlan:
+{% for vlan in desired_vlans %}
+    - vlan-id: "{{ vlan.id }}"
+      config:
+        vlan-id: "{{ vlan.id }}"
+        name: "{{ vlan.name }}"
+{% endfor %}

@@ -1,15 +1,12 @@
 ---
-title: Additional Examples
-parent: f5_ps_ansible.f5os
-nav_order: 9
+title: Configure AOM Login Banner and Idle Timeout
+parent: Examples / Use-Cases
+nav_order: 1
 nav_enabled: true
 ---
 {% raw %}
 
-
-# Additional Examples
-
-## Task: Configure AOM Login Banner and Idle Timeout
+# Configure AOM Login Banner and Idle Timeout
 
 ### Checking the current settings
 
@@ -18,12 +15,10 @@ nav_enabled: true
   f5_ps_ansible.f5os.f5os_restconf_get:
     uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/f5-system-aom:aom'
   register: aom_get
-  tags: ['aom-get']
 
 - name: 'Display AOM resource: f5-system-aom:aom'
   ansible.builtin.debug:
     var: aom_get.api_response.contents
-  tags: ['aom-get']
 ```
 
 ```json
@@ -49,12 +44,10 @@ nav_enabled: true
   f5_ps_ansible.f5os.f5os_restconf_get:
     uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/f5-system-aom:aom/config'
   register: aom_get
-  tags: ['aom-get']
 
 - name: 'Display AOM resource: f5-system-aom:aom'
   ansible.builtin.debug:
     var: aom_get.api_response.contents
-  tags: ['aom-get']
 ```
 
 ```json
@@ -105,7 +98,6 @@ If we can only claim authority over `ssh-session-idle-timeout` we need to use PA
       - ssh-session-banner
       - ipv4
       - ipv6
-  tags: ['aom-patch-idle-timeout']
 ```
 
 If we can only claim authority over `ssh-session-banner`, we need to use PATCH and specify `keys_ignore` with the rest of the options.
@@ -128,7 +120,6 @@ If we can only claim authority over `ssh-session-banner`, we need to use PATCH a
       - ssh-session-idle-timeout
       - ipv4
       - ipv6
-  tags: ['aom-patch-login-banner']
 ```
 
 If we can claim full authority over the `aom` resource, we can declare the configuration in full.
@@ -149,7 +140,6 @@ If we can claim full authority over the `aom` resource, we can declare the confi
             -- Spider-man's grandpa
     keys_ignore:
       - ssh-session-banner
-  tags: ['aom-declarative']
 ```
 
 {% endraw %}
