@@ -57,7 +57,7 @@ curl -sk -u "$F5OS_BASIC_AUTH" \
 ```
 
 {: .note }
-> jq is used to delete the .state attribute from all responses as explained in the documenation. "Raw" API responses would therefore look different to the output in the below steps.
+> `jq` is used to delete the `.state` attribute from all responses as explained in the documenation. "Raw" API responses would therefore look different to the output in the below steps.
 
 
 ## Step 1. Retrieve /data/openconfig-system:system/dns

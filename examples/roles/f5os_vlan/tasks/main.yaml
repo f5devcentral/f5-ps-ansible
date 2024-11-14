@@ -1,0 +1,36 @@
+---
+- name: 'Create VLAN and add to LAG'
+  when: (f5os_vlan_config.state is not defined or f5os_vlan_config.state == 'present')
+  block:
+    - name: 'Create VLAN'
+      f5_ps_ansible.f5os.f5os_restconf_config:
+        uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-vlan:vlans/vlan={{ f5os_vlan_config.id }}"
+        state: "{{ f5os_vlan_config.state | default('present') }}"
+        config:
+          openconfig-vlan:vlan:
+            - vlan-id: "{{ f5os_vlan_config.id }}"
+              config:
+                vlan-id: "{{ f5os_vlan_config.id }}"
+                name: "{{ f5os_vlan_config.name }}"
+        keys_ignore:
+          - members
+
+    - name: 'Configure trunked VLAN on LAG'
+      f5_ps_ansible.f5os.f5os_restconf_config:
+        uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-interfaces:interfaces/interface={{ f5os_vlan_config.lag }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ f5os_vlan_config.id }}"
+        state: "{{ f5os_vlan_config.state | default('present') }}"
+        config:
+          openconfig-vlan:trunk-vlans: ['{{ f5os_vlan_config.id }}']
+
+- name: 'Delete VLAN and remove from LAG'
+  when: f5os_vlan_config.state == 'absent'
+  block:
+    - name: 'Remove VLAN from LAG'
+      f5_ps_ansible.f5os.f5os_restconf_config:
+        uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-interfaces:interfaces/interface={{ f5os_vlan_config.lag }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ f5os_vlan_config.id }}"
+        state: absent
+
+    - name: 'Delete VLAN'
+      f5_ps_ansible.f5os.f5os_restconf_config:
+        uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-vlan:vlans/vlan={{ f5os_vlan_config.id }}"
+        state: absent
