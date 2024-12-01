@@ -126,6 +126,7 @@ def main(MODULE_PATHS, MODULE_DOC_BASEPATH, DOC_TEMPLATE, raw="", endraw=""):
 RELATIVE_MODULE_PATHS = [
     "./ansible_collections/f5_ps_ansible/f5os/plugins/modules/f5os_restconf_config.py",
     "./ansible_collections/f5_ps_ansible/f5os/plugins/modules/f5os_restconf_get.py",
+    "./ansible_collections/f5_ps_ansible/f5os/plugins/modules/f5os_restconf_post.py",
 ]
 
 MODULE_DOC_BASEPATH = "./docs/f5os/ansible_modules_doc/"

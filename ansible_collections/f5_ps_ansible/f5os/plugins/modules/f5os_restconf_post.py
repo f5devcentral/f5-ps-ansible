@@ -9,24 +9,28 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: f5os_restconf_get
-short_description: Get resources from the F5OS RESTCONF API.
+module: f5os_restconf_post
+short_description: POST to resources of the F5OS RESTCONF API.
 description:
-  - Get/Read resources from the F5OS RESTCONF API.
+  - POST/Write to resources of the F5OS RESTCONF API.
 author:
   - Simon Kowallik (@simonkowallik)
-version_added: "1.0.0"
+version_added: "1.3.0"
 options:
   uri:
-    description: The URI of the resource to read.
+    description: The URI of the resource to write to.
     required: True
     type: str
+  config:
+    description: The desired configuration to apply to the resource (PATCH) or to replace the resource with (PUT).
+    required: False
+    type: dict
 attributes:
     check_mode:
-        description: The module supports check mode.
-        support: full
+        description: The module does not support check mode.
+        support: none
     diff_mode:
-        description: The module does not supports diff mode.
+        description: The module does not support diff mode.
         support: none
 notes:
     - This module requires the f5networks.f5os collection to be installed on the ansible controller.
@@ -34,20 +38,9 @@ notes:
 """
 
 EXAMPLES = r"""
-- name: "F5OS API: Wait till ready"
-  f5_ps_ansible.f5os.f5os_restconf_get:
+- name: "# TODO: Add example"
+  f5_ps_ansible.f5os.f5os_restconf_post:
     uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-system:system/f5os-system-version:version"
-  retries: "{{ f5os_api_restart_handler.retries }}"
-  delay: "{{ f5os_api_restart_handler.delay }}"
-
-- name: "Get clock API data"
-  f5_ps_ansible.f5os.f5os_restconf_get:
-    uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-system:system/clock"
-  register: clock_config_state
-
-- name: "Display clock config and state"
-  ansible.builtin.debug:
-    var: clock_config_state
 """
 
 RETURN = r"""
@@ -63,19 +56,29 @@ from ansible.module_utils.connection import ConnectionError
 
 from ansible_collections.f5_ps_ansible.f5os.plugins.module_utils.utils import APIClient
 
+from ansible_collections.f5_ps_ansible.f5os.plugins.module_utils.utils import (
+    APIClient,
+    format_bool_values,
+    number_values_to_string,
+)
+
 
 def main():
     """entry point for module execution"""
     argument_spec = dict(
         uri=dict(required=True, type="str"),
+        config=dict(required=False, type="dict", default=None),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    result = {"changed": False, "failed": False}
+    result = {"changed": True, "failed": False}
+
+    desired_config = number_values_to_string(module.params["config"])
+    desired_config = format_bool_values(desired_config)
 
     api_client = APIClient(module)
     try:
-        api_response = api_client.get(uri=module.params["uri"])
+        api_response = api_client.post(uri=module.params["uri"], config=desired_config)
         result.update({"api_response": api_response or {}})
     except ConnectionError as exc:
         module.fail_json(msg=to_text(exc))

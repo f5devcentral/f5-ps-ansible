@@ -51,6 +51,11 @@ options:
     description: A JMESPath query to filter the current configuration before it is compared to the desired configuration.
     required: False
     type: str
+  secrets:
+    description: A list of secrets to redact from the output. Any value in this list will be redacted with 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'.
+    required: False
+    type: list
+    elements: str
 attributes:
     check_mode:
         description: The module supports check mode and will report what changes would have been made.
@@ -198,6 +203,7 @@ def main():
         ),
         keys_ignore=dict(required=False, type="list", default=[]),
         config_query=dict(required=False, type="str", default=""),
+        secrets=dict(required=False, type="list", default=[], no_log=True),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
