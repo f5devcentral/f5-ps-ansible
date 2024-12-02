@@ -25,6 +25,11 @@ options:
     description: The desired configuration to apply to the resource (PATCH) or to replace the resource with (PUT).
     required: False
     type: dict
+  secrets:
+    description: A list of secrets to redact from the output. Any value in this list will be redacted with 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'.
+    required: False
+    type: list
+    elements: str
 attributes:
     check_mode:
         description: The module does not support check mode.
@@ -38,9 +43,31 @@ notes:
 """
 
 EXAMPLES = r"""
-- name: "# TODO: Add example"
-  f5_ps_ansible.f5os.f5os_restconf_post:
-    uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-system:system/f5os-system-version:version"
+- name: 'Update user password'
+  vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
+    f5os_username: admin
+    f5os_password: "{{ lookup('env', 'F5OS_PASSWORD') }}"
+  block:
+    - name: 'Set user password'
+      f5_ps_ansible.f5os.f5os_restconf_post:
+        uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/aaa/authentication/f5-system-aaa:users/f5-system-aaa:user={{ f5os_username }}/config/f5-system-aaa:set-password'
+        config:
+          f5-system-aaa:password: "{{ f5os_password }}"
+        secrets:
+          - "{{ f5os_password }}"
+    - name: 'Get ansible_date_time variable'
+      ansible.builtin.setup:
+        gather_subset: [min]
+    - name: 'Set last changed - prevents prompting to change password on next login'
+      f5_ps_ansible.f5os.f5os_restconf_config:
+        uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/aaa/authentication/f5-system-aaa:users/f5-system-aaa:user={{ f5os_username }}/config'
+        method: PATCH
+        config:
+          f5-system-aaa:config:
+            last-change: "{{ ansible_date_time.date }}"
+        config_query: |-
+          "f5-system-aaa:config"."last-change" | { "f5-system-aaa:config": { "last-change": @ } }
 """
 
 RETURN = r"""
@@ -68,10 +95,11 @@ def main():
     argument_spec = dict(
         uri=dict(required=True, type="str"),
         config=dict(required=False, type="dict", default=None),
+        secrets=dict(required=False, type="list", default=[], no_log=True),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-    result = {"changed": True, "failed": False}
+    result = {"changed": True, "failed": True}
 
     desired_config = number_values_to_string(module.params["config"])
     desired_config = format_bool_values(desired_config)
@@ -80,6 +108,8 @@ def main():
     try:
         api_response = api_client.post(uri=module.params["uri"], config=desired_config)
         result.update({"api_response": api_response or {}})
+        if api_response.get("code", 0) >= 200 and api_response.get("code", 0) < 300:
+            result["failed"] = False
     except ConnectionError as exc:
         module.fail_json(msg=to_text(exc))
 
