@@ -81,8 +81,6 @@ from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.connection import ConnectionError
 
-from ansible_collections.f5_ps_ansible.f5os.plugins.module_utils.utils import APIClient
-
 from ansible_collections.f5_ps_ansible.f5os.plugins.module_utils.utils import (
     APIClient,
     format_bool_values,
