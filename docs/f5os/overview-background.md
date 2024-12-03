@@ -34,6 +34,7 @@ In addition it supports almost all F5OS API endpoints.
 - typing is taken care of (many numeric values are considered a string)
 - idempotency is implemented
 - comparison of desired and current configuration is in place
+- secrets can be hidden in log output while retaining important debug information
 
 The below guide should get you started.
 
