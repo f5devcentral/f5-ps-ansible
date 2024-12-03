@@ -1,0 +1,25 @@
+---
+# openssl req \
+#  -x509 -newkey rsa:2048 -sha256 -days 5 \
+#  -keyout key.pem -passout pass:SecretKeyPassphrase \
+#  -out crt.pem \
+#  -subj "/CN=f5os.example.net" -addext "subjectAltName=DNS:f5os.example.net,DNS:*.f5os.example.net"
+f5os_system_tls_config:
+  # add content of crt.pem below
+  certificate: |
+    -----BEGIN CERTIFICATE-----
+    ..
+    -----END CERTIFICATE-----
+  # add content of key.pem below
+  key: |
+    -----BEGIN ENCRYPTED PRIVATE KEY-----
+    ..
+    -----END ENCRYPTED PRIVATE KEY-----
+  passphrase: "SecretKeyPassphrase"
+#  ca_chain:
+#    - name: my-intermediate-ca
+#      state: present
+#      certificate: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
+#    - name: my-outdated-intermediate-ca
+#      state: absent
+#      certificate: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"

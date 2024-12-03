@@ -1,0 +1,22 @@
+---
+- name: "Pause for {{ f5os_wait_for_system_handler.timeout }}s before checking status"
+  ansible.builtin.wait_for:
+    timeout: "{{ f5os_wait_for_system_handler.timeout }}"
+  listen: "Wait for F5OS system"
+
+- name: "Wait till system is ready: (delay: {{ f5os_wait_for_system_handler.delay }}) ({{ f5os_wait_for_system_handler.retries }} total retries)"
+  f5_ps_ansible.f5os.f5os_restconf_get:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}{{ f5os_wait_for_system_handler.check_uri }}"
+  retries: "{{ f5os_wait_for_system_handler.retries }}"
+  delay: "{{ f5os_wait_for_system_handler.delay }}"
+  changed_when: false
+  listen: "Wait for F5OS system"
+  register: f5os_wait_for_system_handler_response
+  failed_when: >
+    (f5os_wait_for_system_handler_response.api_response.code is not defined) or
+    (f5os_wait_for_system_handler_response.api_response.code != 200)
+
+- name: "Pause for {{ f5os_wait_for_system_handler.timeout }}s after checking status"
+  ansible.builtin.wait_for:
+    timeout: "{{ f5os_wait_for_system_handler.timeout }}"
+  listen: "Wait for F5OS system"

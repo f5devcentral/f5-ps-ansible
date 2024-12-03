@@ -14,18 +14,48 @@ It's best to run it with very verbose debugging and step-by-step (tag by tag) to
 Example:
 
 ```shell
-ansible-playbook -vvv f5os_restconf_api_journey.yaml -t <step-X> -i <f5os_test_device>
+# set the IP, username and password
+export F5OS_MGMT_IP=192.168.0.246
+export F5OS_USER=admin
+export F5OS_USER_PASSWORD='admin'
 ```
 
-You will still need a F5OS test device and a working ansible inventory pointing towards it.
+```console
+# run through each step, one by one
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-1
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-2
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-3
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-4
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-5
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-6
+ansible-playbook -vvv f5os_restconf_api_journey.yaml -t step-7
+```
+
+{ .note }
+> You will still need a F5OS test device. For better reproducibility this documentation avoids the need for an inventory by using tricks to provide a fully runnable single playbook file.
 
 ```yaml
+# f5os_restconf_api_journey.yaml
 ---
 - name: 'F5OS RESTCONF API journey'
-  connection: httpapi
-  hosts: all
+  #connection: httpapi  # use this with an inventory
+  #hosts: all  # use this with an inventory
+  connection: local  # used for a single runnable playbook without an inventory, see above otherwise
+  hosts: localhost  # used for a single runnable playbook without an inventory, see above otherwise
   gather_facts: false
   vars:
+    # the below overwrites the playbook 'connection' to allow the f5_ps_ansible collection to utilize the httpapi to connect to F5OS - this is only needed to provide a single runnable playbook
+    ansible_connection: httpapi
+
+    # the below typically belongs in the inventory
+    ansible_host: "{{ lookup('env', 'F5OS_MGMT_IP') }}"  # The F5OS management IP
+    ansible_user: "{{ lookup('env', 'F5OS_USER') | default('admin') }}"  # F5OS user with access rights to the API
+    ansible_httpapi_password: "{{ lookup('env', 'F5OS_USER_PASSWORD') }}"  # Use a vault for credentials
+    ansible_httpapi_port: 443
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false  # Note: Security warning, always use cert validation unless running in a contained ans secure lab environment
+    ansible_network_os: f5networks.f5os.f5os
+
     # f5os api prefix determination based on https port
     f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
 
