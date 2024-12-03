@@ -28,25 +28,9 @@ clean-test: ## remove test and coverage artifacts
 	find . -name '.mypy_cache' -exec rm -fr {} +
 	rm -rf ansible_collections/f5_ps_ansible/f5os/tests/output
 
-lint: ruff pylint ## check style with ruff and pylint
-
-pylint:
-	pylint ansible_collections/f5_ps_ansible/f5os/plugins/modules/*.py
-	pylint ansible_collections/f5_ps_ansible/f5os/plugins/module_utils/*.py
-
-black:
-	black ansible_collections/f5_ps_ansible/f5os/plugins/modules/*.py
-	black ansible_collections/f5_ps_ansible/f5os/plugins/module_utils/*.py
-
-ruff:
-	ruff format ansible_collections/f5_ps_ansible/f5os/plugins/modules/*.py
-	ruff format ansible_collections/f5_ps_ansible/f5os/plugins/module_utils/*.py
-
-isort:
-	isort ansible_collections/f5_ps_ansible/f5os/plugins/modules/*.py
-	isort ansible_collections/f5_ps_ansible/f5os/plugins/module_utils/*.py
-
-code-format: isort black ruff # more is MORE!
+code-format:
+	ruff check --select I --fix --exclude .venv
+	ruff format --exclude .venv
 
 doc: docs ## alias for docs
 
