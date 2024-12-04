@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import pytest
 import sys
 
+import pytest
+
 from ansible_collections.f5_ps_ansible.f5os.plugins.module_utils.utils import (
-    number_values_to_string,
-    format_bool_values,
-    dicts_equal,
-    remove_state_property,
     changes_add_deep_diff,
+    dicts_equal,
+    format_bool_values,
+    number_values_to_string,
     recurse_remove_keys,
+    remove_state_property,
 )
 
 try:
@@ -164,36 +165,205 @@ class Test_dicts_equal:
     @pytest.mark.parametrize(
         "d1, d2, result",
         [
-            ({ "one": [ {"t": "1", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "c"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": True}, [1, 3, 2, True, False], {"t": "2", "l": ["a", 2, "c"]}, ], "list": [2, 1, 3,] },
-            True),
-            ({ "one": [ {"t": "XXX", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "c"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": True}, [1, 3, 2, True, False], {"t": "2", "l": ["a", 2, "c"]}, ], "list": [2, 1, 3,] },
-            False),
-            ({ "one": [ {"t": "1", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "c"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": False}, [1, 3, 2, True, False], {"t": "2", "l": ["a", 2, "c"]}, ], "list": [2, 1, 3,] },
-            False),
-            ({ "one": [ {"t": "1", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "c"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": True}, [1, 99999, 2, True, False], {"t": "2", "l": ["a", 2, "c"]}, ], "list": [2, 1, 3,] },
-            False),
-            ({ "one": [ {"t": "1", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "XXXX"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": True}, [1, 3, 2, True, False], {"t": "2", "l": ["a", 2, "c"]}, ], "list": [2, 1, 3,] },
-            False),
-            ({ "one": [ {"t": "1", "1": True, "k": "a",}, {"t": "2", "l": ["a", 2, "c"]}, [1, 2, 3, False, True] ], "list": [1, 2, 3,] },
-             { "one": [ {"t": "1", "k": "a", "1": True}, [1, 3, 2, True, False], {"t": "2", "l": ["XXXX", 2, "c"]}, ], "list": [2, 1, 3,] },
-            False),
-        ])
-
+            (
+                {
+                    "one": [
+                        {
+                            "t": "1",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "c"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": True},
+                        [1, 3, 2, True, False],
+                        {"t": "2", "l": ["a", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                True,
+            ),
+            (
+                {
+                    "one": [
+                        {
+                            "t": "XXX",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "c"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": True},
+                        [1, 3, 2, True, False],
+                        {"t": "2", "l": ["a", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                False,
+            ),
+            (
+                {
+                    "one": [
+                        {
+                            "t": "1",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "c"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": False},
+                        [1, 3, 2, True, False],
+                        {"t": "2", "l": ["a", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                False,
+            ),
+            (
+                {
+                    "one": [
+                        {
+                            "t": "1",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "c"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": True},
+                        [1, 99999, 2, True, False],
+                        {"t": "2", "l": ["a", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                False,
+            ),
+            (
+                {
+                    "one": [
+                        {
+                            "t": "1",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "XXXX"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": True},
+                        [1, 3, 2, True, False],
+                        {"t": "2", "l": ["a", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                False,
+            ),
+            (
+                {
+                    "one": [
+                        {
+                            "t": "1",
+                            "1": True,
+                            "k": "a",
+                        },
+                        {"t": "2", "l": ["a", 2, "c"]},
+                        [1, 2, 3, False, True],
+                    ],
+                    "list": [
+                        1,
+                        2,
+                        3,
+                    ],
+                },
+                {
+                    "one": [
+                        {"t": "1", "k": "a", "1": True},
+                        [1, 3, 2, True, False],
+                        {"t": "2", "l": ["XXXX", 2, "c"]},
+                    ],
+                    "list": [
+                        2,
+                        1,
+                        3,
+                    ],
+                },
+                False,
+            ),
+        ],
+    )
     def test_deep(self, d1, d2, result):
         assert dicts_equal(d1, d2) == result
 
     def test_mutation(self):
-        '''must not mutate input dictionaries'''
+        """must not mutate input dictionaries"""
         d1 = {"list": [{"key1": "IGNORE!", "key2": 2}]}
-        d2 = {"list": [{"key1": 1,         "key2": 2}]}
+        d2 = {"list": [{"key1": 1, "key2": 2}]}
 
-        assert dicts_equal(d1, d2, remove_keys=['key1']) == True
-        assert d2 == {"list": [{"key1": 1,         "key2": 2}]}
+        assert dicts_equal(d1, d2, remove_keys=["key1"]) == True
+        assert d2 == {"list": [{"key1": 1, "key2": 2}]}
+
 
 class Test_remove_state_property:
     TEST_NTP = [
@@ -366,4 +536,3 @@ class Test_format_bool_values:
         }
 
         assert format_bool_values(test_data) == expected_data
-

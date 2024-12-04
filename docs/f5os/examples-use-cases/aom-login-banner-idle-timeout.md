@@ -61,11 +61,10 @@ nav_enabled: true
 
 ### Validating which configuration options exist for this resource
 
-
 f5sh / rseries cli (admin):
 
-```shell
-my-rSeries # show running-config system aom config
+```console
+rSeriesDevice # show running-config system aom config
 Possible completions:
   ipv4                       Configure AOM IPv4 interface.
   ipv6                       Configure AOM IPv6 interface.

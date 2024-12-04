@@ -51,6 +51,11 @@ options:
     description: A JMESPath query to filter the current configuration before it is compared to the desired configuration.
     required: False
     type: str
+  secrets:
+    description: A list of secrets to redact from the output. Any value in this list will be redacted with 'VALUE_SPECIFIED_IN_NO_LOG_PARAMETER'.
+    required: False
+    type: list
+    elements: str
 attributes:
     check_mode:
         description: The module supports check mode and will report what changes would have been made.
@@ -67,16 +72,20 @@ notes:
 
 EXAMPLES = r"""
 - name: 'Set the login banner'
+  vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
   f5_ps_ansible.f5os.f5os_restconf_config:
-    uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-system:system/config/login-banner"
+    uri: "{{ f5os_api_prefix }}/data/openconfig-system:system/config/login-banner"
     config:
       openconfig-system:login-banner: |-
         With great power comes great responsibility!
         -- Spider-man's grandpa
 
 - name: 'Configure trunked VLANs'
+  vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
   f5_ps_ansible.f5os.f5os_restconf_config:
-    uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-interfaces:interfaces/interface={{ item.interface }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ item.id }}"
+    uri: "{{ f5os_api_prefix }}/data/openconfig-interfaces:interfaces/interface={{ item.interface }}/openconfig-if-aggregate:aggregation/openconfig-vlan:switched-vlan/config/trunk-vlans={{ item.id }}"
     state: "{{ item.state | default('present') }}"
     config:
       openconfig-vlan:trunk-vlans: ['{{ item.id }}']
@@ -90,8 +99,10 @@ EXAMPLES = r"""
       state: absent  # Remove VLAN 30 from interface 7.0
 
 - name: 'Partially configure LLDP'
+  vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
   f5_ps_ansible.f5os.f5os_restconf_config:
-    uri: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}/data/openconfig-lldp:lldp/config"
+    uri: "{{ f5os_api_prefix }}/data/openconfig-lldp:lldp/config"
     method: PATCH  # Use PATCH to partially update the configuration
     config:
       openconfig-lldp:config:
@@ -111,6 +122,7 @@ EXAMPLES = r"""
 
 - name: 'Using PATCH on a group of resources (list) with additional config endpoints'
   vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
     server:
       address: 9.9.9.11
       port: 53
@@ -136,6 +148,26 @@ EXAMPLES = r"""
               config:
                 address: "{{ server.address }}"
                 port: "{{ server.port }}"  # no need to change to int, the type is ignored by the ansible module
+
+- name: 'Set system proxy for automatic licensing and qkview uploads'
+  # https://clouddocs.f5.com/training/community/rseries-training/html/rseries_security.html#proxy-server-via-api-for-licensing-and-qkview-uploads-to-ihealth
+  vars:
+    f5os_api_prefix: "{{ '/restconf' if ansible_httpapi_port == '8888' else '/api' }}"
+    proxy_username: f5os-proxy-user
+    proxy_password: "{{ lookup('env', 'PROXY_PASSWORD') }}"
+    proxy_server: https://proxyserver.internal.example.net
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: '{{ f5os_api_prefix }}/data/openconfig-system:system/f5-system-diagnostics-qkview:diagnostics/f5-system-diagnostics-proxy:proxy'
+    config:
+      f5-system-diagnostics-proxy:proxy:
+        config:
+          proxy-username: "{{ proxy_username }}"
+          proxy-password: "{{ proxy_password }}"
+          proxy-server: "{{ proxy_server }}"
+    keys_ignore:
+      - proxy-password
+    secrets:
+      - "{{ proxy_password }}"  # redact the proxy password in logs and debug messages (no_log)
 """
 
 RETURN = r"""
@@ -198,6 +230,7 @@ def main():
         ),
         keys_ignore=dict(required=False, type="list", default=[]),
         config_query=dict(required=False, type="str", default=""),
+        secrets=dict(required=False, type="list", default=[], no_log=True),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 

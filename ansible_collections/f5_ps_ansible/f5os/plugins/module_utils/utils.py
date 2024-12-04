@@ -45,6 +45,10 @@ class APIClient:
         """update a resource."""
         return self.call("PUT", *args, **kwargs)
 
+    def post(self, *args, **kwargs):
+        """update a resource."""
+        return self.call("POST", *args, **kwargs)
+
     def patch(self, *args, **kwargs):
         """update a resource."""
         return self.call("PATCH", *args, **kwargs)

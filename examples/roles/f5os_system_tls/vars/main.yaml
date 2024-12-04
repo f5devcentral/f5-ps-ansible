@@ -1,0 +1,6 @@
+---
+f5os_wait_for_system_handler:
+  timeout: 30
+  retries: 30
+  delay: 10
+  check_uri: '/data/f5-service-pod:service-pods'

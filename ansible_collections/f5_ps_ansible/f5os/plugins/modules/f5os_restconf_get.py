@@ -23,10 +23,10 @@ options:
     type: str
 attributes:
     check_mode:
-        description: The module supports check mode and will report what changes would have been made.
+        description: The module supports check mode.
         support: full
     diff_mode:
-        description: The module supports diff mode and will report the differences between the desired and actual state.
+        description: The module does not supports diff mode.
         support: none
 notes:
     - This module requires the f5networks.f5os collection to be installed on the ansible controller.

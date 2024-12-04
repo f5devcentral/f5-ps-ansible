@@ -17,7 +17,8 @@ Using `requirements.yml`:
   type: git
 ```
 
-`f5_ps_ansible.f5os` is currently **NOT** available on Ansible Galaxy!
+> [!NOTE]  
+> `f5_ps_ansible.f5os` is currently **NOT** available on Ansible Galaxy!
 
 
 ## Dependencies

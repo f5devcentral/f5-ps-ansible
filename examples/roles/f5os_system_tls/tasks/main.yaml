@@ -1,0 +1,38 @@
+---
+- name: "F5OS system TLS: Set Intermediate CA Certificate Chain"
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-system:system/aaa/f5-openconfig-aaa-tls:tls/ca-bundles/ca-bundle={{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    config:
+      f5-openconfig-aaa-tls:ca-bundle:
+        - name: "{{ item.name }}"
+          config:
+            name: "{{ item.name }}"
+            content: "{{ item.certificate }}"
+  loop: "{{ f5os_system_tls_config.ca_chain }}"
+  when: f5os_system_tls_config.ca_chain is defined
+  notify: ["Wait for F5OS system"]
+
+- name: "F5OS system TLS: Set Device Certificate and Key"
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-system:system/aaa/f5-openconfig-aaa-tls:tls/config"
+    config:
+      f5-openconfig-aaa-tls:config:
+        certificate: "{{ f5os_system_tls_config.certificate }}"
+        key: "{{ f5os_system_tls_config.key }}"
+        passphrase: "{{ f5os_system_tls_config.passphrase }}"
+        #verify-client: false
+        #verify-client-depth: 1
+    secrets:
+      - "{{ f5os_system_tls_config.key }}"
+      - "{{ f5os_system_tls_config.passphrase }}"
+    keys_ignore: [
+      "verify-client",
+      "verify-client-depth",
+      "passphrase",  # will be returned as cryptogram hence differ to the submitted passphrase
+      "key",  # will be returned as cryptogram hence differ to the submitted key
+      ]
+  notify: ["Wait for F5OS system"]
+
+- name: "Run Handler immediately: Wait for F5OS system"
+  ansible.builtin.meta: flush_handlers
