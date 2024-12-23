@@ -15,7 +15,7 @@ deepdiff = { version = "^8.0.1", optional = true }
 all = ["jmespath", "deepdiff"]
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.8.1"
+ruff = "^0.8.4"
 pytest = "^8.3.2"
 ansible-core = "^2.17.7"
 jmespath = "^1.0.1"
