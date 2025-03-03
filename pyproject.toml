@@ -16,7 +16,7 @@ all = ["jmespath", "deepdiff"]
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.8.1"
-pytest = "^8.3.2"
+pytest = "^8.3.5"
 ansible-core = "^2.17.7"
 jmespath = "^1.0.1"
 deepdiff = "^8.0.1"
