@@ -1,0 +1,4 @@
+---
+f5os_set_user_password_config:
+  username: REQUIRED_VALUE_MISSING
+  password: REQUIRED_VALUE_MISSING
