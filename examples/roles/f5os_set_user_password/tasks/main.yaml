@@ -1,0 +1,17 @@
+---
+- name: "Set User Password: Set Password for {{ f5os_set_user_password_config.username }}"
+  f5_ps_ansible.f5os.f5os_restconf_post:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-system:system/aaa/authentication/f5-system-aaa:users/f5-system-aaa:user={{ f5os_set_user_password_config.username }}/f5-system-aaa:config/f5-system-aaa:set-password"
+    config:
+      f5-system-aaa:password: "{{ f5os_set_user_password_config.password }}"
+    secrets:
+      - "{{ f5os_set_user_password_config.password }}"
+
+- name: "Set User Password: Update Last Change Date for {{ f5os_set_user_password_config.username }}"
+  # required to prevent the change password prompt to appear at next logon
+  f5_ps_ansible.f5os.f5os_restconf_config:
+    uri: "{{ f5os_api_prefix | default('/restconf' if ansible_httpapi_port == '8888' else '/api') }}/data/openconfig-system:system/aaa/authentication/f5-system-aaa:users/f5-system-aaa:user={{ f5os_set_user_password_config.username }}/config"
+    method: PATCH
+    config:
+      f5-system-aaa:config:
+        last-change: "{{ '%Y-%m-%d' | strftime }}" # YYYY-MM-DD
