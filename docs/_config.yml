@@ -1,6 +1,6 @@
 title: f5-ps-ansible
 description: This collection provides modules to configure F5 BIG-IP appliances running F5OS using the RESTCONF API interface.
-remote_theme: just-the-docs/just-the-docs@v0.10.0
+remote_theme: just-the-docs/just-the-docs@v0.10.1
 
 url: https://f5devcentral.github.io/f5-ps-ansible/
 
